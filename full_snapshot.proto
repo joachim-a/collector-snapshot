@@ -177,6 +177,7 @@ message LogLineInformation {
     HINT = 10;
     CONTEXT = 11;
     STATEMENT = 12;
+    QUERY = 13; // This is specific to PL/pgSQL
   }
 
   LogLevel log_level = 12;
@@ -184,7 +185,50 @@ message LogLineInformation {
   enum LogClassification {
     UNKNOWN_LOG_CLASSIFICATION = 0;
 
-    // Work in progress
+    // Server events
+    SERVER_CRASHED = 1; // "Segmentation fault", "was terminated by signal 6", "was terminated by signal 11"
+    SERVER_START = 2; // "database system is ready", "entering standby mode", "database system was shut down"
+    SERVER_MISC = 3; // "could not open usermap file"
+
+    // Connection-related
+    CONNECTION_RECEIVED = 10; // "connection received: "
+    CONNECTION_AUTHORIZED = 11; // "connection authorized: "
+    CONNECTION_REJECTED = 12; // "pg_hba.conf rejects connection", "is not currently accepting connections", "password authentication failed"
+    CONNECTION_DISCONNECTED = 13; // "disconnection: "
+    CONNECTION_CLIENT = 14; // "incomplete startup packet"
+    TOO_MANY_CONNECTIONS_ROLE = 15; // "too many connections for role"
+
+    // Checkpointer related
+    CHECKPOINT_STARTING = 20; // "checkpoint starting: "
+    CHECKPOINT_COMPLETE = 21; // "checkpoint complete: "
+    CHECKPOINT_TOO_FREQUENT = 22; // "checkpoints are occurring too frequently"
+    RESTARTPOINT_STARTING = 23; // "restartpoint starting: "
+    RESTARTPOINT_COMPLETE = 24; // "restartpoint complete: "
+    RESTARTPOINT_AT = 25; // "recovery restart point at"
+
+    // WAL/Archiving
+    WAL_INVALID_RECORD_LENGTH = 30; // "invalid record length"
+    WAL_REDO = 31; // "redo "
+
+    // Autovacuum
+    AUTOVACUUM_CANCEL = 40; // "canceling autovacuum task"
+    TXID_WRAPAROUND_WARNING = 41; // "database * must be vacuumed within"
+    TXID_WRAPAROUND_ERROR = 42; //"database is not accepting commands to avoid wraparound data loss"
+
+    // Locks
+    LOCK_ACQUIRED = 50; // "acquired *Lock"
+    LOCK_WAITING = 51; // "still waiting for *Lock"
+    LOCK_TIMEOUT = 52; // "canceling statement due to lock timeout"
+    LOCK_DEADLOCK_DETECTED = 53; // "process * detected deadlock while waiting"
+    LOCK_DEADLOCK_AVOIDED = 54; // "process * avoided deadlock for *Lock"
+
+    // Notices about statement execution
+    STATEMENT_DURATION = 60; // "duration: "
+
+    // Standby
+    STANDBY_RESTORED_WAL_FROM_ARCHIVE = 70; // "restored log file * from archive"
+    STANDBY_STARTED_STREAMING = 71; // "started streaming WAL"
+    STANDBY_CONSISTENT_RECOVERY_STATE = 72; // "consistent recovery state reached at"
   }
 
   LogClassification log_classification = 13;
